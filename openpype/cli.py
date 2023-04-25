@@ -166,41 +166,6 @@ def publish(paths, targets, gui):
 
 
 @main.command()
-@click.argument("path")
-@click.option("-h", "--host", help="Host")
-@click.option("-u", "--user", help="User email address")
-@click.option("-p", "--project", help="Project")
-@click.option("-t", "--targets", help="Targets", default=None,
-              multiple=True)
-def remotepublishfromapp(project, path, host, user=None, targets=None):
-    """Start CLI publishing.
-
-    Publish collects json from paths provided as an argument.
-    More than one path is allowed.
-    """
-
-    PypeCommands.remotepublishfromapp(
-        project, path, host, user, targets=targets
-    )
-
-
-@main.command()
-@click.argument("path")
-@click.option("-u", "--user", help="User email address")
-@click.option("-p", "--project", help="Project")
-@click.option("-t", "--targets", help="Targets", default=None,
-              multiple=True)
-def remotepublish(project, path, user=None, targets=None):
-    """Start CLI publishing.
-
-    Publish collects json from paths provided as an argument.
-    More than one path is allowed.
-    """
-
-    PypeCommands.remotepublish(project, path, user, targets=targets)
-
-
-@main.command()
 @click.option("-p", "--project", required=True,
               help="name of project asset is under")
 @click.option("-a", "--asset", required=True,
