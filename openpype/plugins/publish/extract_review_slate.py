@@ -86,8 +86,11 @@ class ExtractReviewSlate(publish.Extractor):
                 input_width,
                 input_height,
                 input_timecode,
-                input_frame_rate
+                input_frame_rate,
+                input_pixel_aspect
             ) = self._get_video_metadata(streams)
+            if input_pixel_aspect:
+                pixel_aspect = input_pixel_aspect
 
             # Raise exception of any stream didn't define input resolution
             if input_width is None:
@@ -421,6 +424,7 @@ class ExtractReviewSlate(publish.Extractor):
         input_width = None
         input_height = None
         input_frame_rate = None
+        input_pixel_aspect = None
         for stream in streams:
             if stream.get("codec_type") != "video":
                 continue
@@ -432,6 +436,14 @@ class ExtractReviewSlate(publish.Extractor):
             height = int(stream["height"])
             if not width or not height:
                 continue
+
+            if "sample_aspect_ratio" in stream:
+                # in form 1:1
+                _pa = str(stream["sample_aspect_ratio"])
+                try:
+                    input_pixel_aspect = float(eval(_pa.replace(':','/')))
+                except:
+                    pass
 
             # Make sure that width and height are captured even if frame rate
             #    is not available
@@ -448,7 +460,8 @@ class ExtractReviewSlate(publish.Extractor):
             input_width,
             input_height,
             input_timecode,
-            input_frame_rate
+            input_frame_rate,
+            input_pixel_aspect
         )
 
     def _get_audio_metadata(self, streams):
