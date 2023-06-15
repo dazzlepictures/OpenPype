@@ -1,6 +1,8 @@
 """Host API required Work Files tool"""
 import os
 import nuke
+from qtpy import QtWidgets
+import shutil
 
 
 def file_extensions():
@@ -24,11 +26,24 @@ def open_file(filepath):
 
     # To remain in the same window, we have to clear the script and read
     # in the contents of the workfile.
-    nuke.scriptClear()
-    nuke.scriptReadFile(filepath)
-    nuke.Root()["name"].setValue(filepath)
-    nuke.Root()["project_directory"].setValue(os.path.dirname(filepath))
-    nuke.Root().setModified(False)
+    def read_script(nuke_script):
+        nuke.scriptClear()
+        nuke.scriptReadFile(nuke_script)
+        nuke.Root()["name"].setValue(nuke_script)
+        nuke.Root()["project_directory"].setValue(os.path.dirname(nuke_script))
+        nuke.Root().setModified(False)
+
+    read_script(filepath)
+    headless = QtWidgets.QApplication.instance() is None
+    if not headless:
+        autosave = str(nuke.toNode("preferences")["AutoSaveName"].evaluate())
+        autosave_prmpt = "Autosave detected.\nWould you like to load the autosave file?"       # noqa
+        if os.path.isfile(autosave) and nuke.ask(autosave_prmpt):
+            try:
+                shutil.copy(autosave, filepath)
+                read_script(filepath)
+            except:
+                nuke.message("Autosave file could not be copied!")
     return True
 
 
